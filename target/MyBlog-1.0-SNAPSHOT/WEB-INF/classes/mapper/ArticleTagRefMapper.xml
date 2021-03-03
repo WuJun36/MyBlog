@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.dao.ArticleTagRefMapper">
+    
+    <select id="getTagByArticleId" resultType="com.blog.entity.Tag">
+        SELECT a.tag_id,a.tag_name,a.tag_description
+        FROM tag a
+        JOIN article_tag_ref b
+        ON a.tag_id = b.tag_id
+        WHERE b.article_id = 1
+    </select>
+
+
+</mapper>

@@ -1,0 +1,5 @@
+com\blog\test\ArticleServiceImpTest.class
+com\blog\test\CommentServiceImpTest.class
+com\blog\test\OptionsServiceImpTest.class
+com\blog\test\TagServiceImpTest.class
+com\blog\test\CategoryServiceTest.class

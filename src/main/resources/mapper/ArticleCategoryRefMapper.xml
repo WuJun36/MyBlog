@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.dao.ArticleCategoryRefMapper">
+
+<!--    <resultMap id="CategoryResultMap" type="com.blog.entity.Category">-->
+<!--        <result column="article_id" property="articleId"></result>-->
+<!--        <result column="category_name" property="categoryName"></result>-->
+<!--        -->
+<!--    </resultMap>-->
+
+    <sql id="tb">article_category_ref</sql>
+
+    <sql id="Base_Column_List">
+        article_id,category_id
+    </sql>
+
+    <select id="getCategoryByArticleId" resultType="com.blog.entity.Category">
+        SELECT a.category_id,a.category_name,a.category_pid,a.category_description
+        FROM category a
+        JOIN article_category_ref b
+        ON a.category_id = b.category_id
+        WHERE b.article_id = #{articleId}
+    </select>
+
+</mapper>
+    

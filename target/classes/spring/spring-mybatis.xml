@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+	   http://www.springframework.org/schema/tx/spring-tx.xsd">
+    
+    <context:component-scan base-package="com.blog">
+        <context:exclude-filter type="custom" expression="com.blog.controller"/>
+    </context:component-scan>
+
+
+    <context:property-placeholder location="classpath:jdbc/jdbc.properties"></context:property-placeholder>
+
+<!--    配置druid数据库连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/my_blog/product"></property>
+        <property name="username" value="root"></property>
+        <property name="password"  value="abcd@1234"></property>
+    </bean>
+
+<!--    mybatis配置-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+<!--        加载mybatis全局配置文件-->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"></property>
+<!--        引用数据库源-->
+        <property name="dataSource" ref="dataSource"></property>
+<!--         加载mapper所在包-->
+        <property name="mapperLocations"  value="classpath:mapper/*Mapper.xml"></property>
+    </bean>
+
+<!--    要把每一个dao接口注入容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.blog.dao"/>
+    </bean>
+
+<!--    配置spring事务管理-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+<!--    控制住数据源-->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+<!--    开启基于注解的声明式事务，依赖于tx空间-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+</beans>

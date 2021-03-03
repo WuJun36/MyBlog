@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.dao.CategoryMapper">
+
+    <sql id="tb">category</sql>
+
+    <sql id="Base_Column_List">
+        category_id,category_name,category_pid,category_description
+    </sql>
+
+    <select id="selectAllCategory" resultType="com.blog.entity.Category">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="tb"/>
+    </select>
+
+    <select id="countCategory" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        <include refid="tb"></include>
+    </select>
+
+    <select id="getCategoryById" resultType="com.blog.entity.Category">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        <include refid="tb"></include>
+        WHERE
+        category_id = #{id}
+
+    </select>
+
+</mapper>
+    

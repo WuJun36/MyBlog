@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.dao.TagMapper">
+
+    <sql id="tb">tag</sql>
+
+    <sql id="Base_Column_List">
+        tag_id,tag_name,tag_description
+    </sql>
+
+<!--    标签数量-->
+    <select id="countTags" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM
+        <include refid="tb"/>
+    </select>
+
+<!--    查询全部标签信息-->
+    <select id="selectAllTags" resultType="com.blog.entity.Tag">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="tb"/>
+    </select>
+
+<!--    根据标签ID查询标签详情-->
+    <select id="getTagById" resultType="com.blog.entity.Tag">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="tb"/>
+        WHERE tag_id = #{tagId}
+    </select>
+
+</mapper>
+    

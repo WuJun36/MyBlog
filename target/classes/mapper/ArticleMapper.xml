@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace：名称空间，写接口的全类名，相当于告诉mybatis这个配置文件是实现哪个接口-->
+<mapper namespace="com.blog.dao.ArticleMapper">
+    <!--    对外部 resultMap 的命名引用。 resultType 和 resultMap 之间只能同时使用一个。-->
+    <resultMap id="ArticleResultMap" type="com.blog.entity.Article">
+        <id property="articleId" column="article_id" jdbcType="INTEGER"/>
+        <result property="articleTitle" column="article_title" jdbcType="VARCHAR"/>
+        <result property="articleContent" column="article_content" jdbcType="LONGVARCHAR"/>
+        <result property="articleAuthorId" column="article_author_id" jdbcType="INTEGER"/>
+        <result property="articleCommentCount" column="article_comment_count" jdbcType="INTEGER"/>
+        <result property="articleViewCount" column="article_view_count" jdbcType="INTEGER"/>
+        <result property="articleLikeCount" column="article_like_count" jdbcType="INTEGER"/>
+        <result property="articleCreateTime" column="article_create_time" jdbcType="TIMESTAMP"/>
+        <result property="articleUpdateTime" column="article_update_time" jdbcType="TIMESTAMP"/>
+        <result property="articleStatus" column="article_status" jdbcType="INTEGER"/>
+
+    </resultMap>
+
+    <!--    用来定义可重用的 SQL 代码片段-->
+    <sql id="tb">article</sql>
+
+    <sql id="Base_Column_List">
+        article_id,article_title,article_content,article_author_id,article_comment_count,article_view_count,article_like_count,article_create_time,
+        article_update_time,article_status
+    </sql>
+
+    <!--   select 用来定义一个查询操作
+           id:方法名 相当于这个配置是对于某个方法的实现
+           resultType：指定方法运行后的返回值类型（查询操作必须指定的）
+            #{属性名}:代表取出传递过来的某个参数的值-->
+<!--    获取文章列表-->
+    <select id="getArticleList" resultMap="ArticleResultMap">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        <include refid="tb"/>
+        <where>
+            <if test="status != null">
+                AND article_status = #{status}
+            </if>
+            <if test="categoryId != null">
+                AND article_id IN (
+                SELECT article_id
+                FROM  article_category_ref
+                WHERE category_id = #{categoryId}
+                )
+            </if>
+            <if test="tagId != null">
+                AND article_id IN (
+                SELECT article_id
+                FROM  article_tag_ref
+                WHERE tag_id = #{tagId}
+                )
+            </if>
+
+        </where>
+
+        ORDER BY
+        article_create_time DESC
+    </select>
+
+<!--    插入文章-->
+    <insert id="insertArticle" useGeneratedKeys="true" keyProperty="articleId">
+        INSERT INTO
+        <include refid="tb"/>
+        (article_title,article_content,article_author_id,
+        article_comment_count,article_view_count,article_like_count,
+        article_create_time,article_update_time,article_status)
+        VALUES(#{articleTitle},#{articleContent},#{articleAuthorId},
+        #{articleCommentCount},#{articleViewCount},#{articleLikeCount}
+        #{articleCreateTime},#{articleUpdateTime},#{articleStatus})
+    </insert>
+
+<!--    根据ID删除文章-->
+    <delete id="deleteArticleById">
+        DELETE FROM
+        <include refid="tb"/>
+        WHERE article_id = #{articleId}
+    </delete>
+
+<!--    根据ID更新文章-->
+    <update id="updateArticleById" useGeneratedKeys="true" keyProperty="articleId">
+        UPDATE
+        <include refid="tb"/>
+        <set>
+            <if test="articleTitle != null">article_title = #{articleTitle}</if>
+            <if test="articleContent != null">article_content = #{articleContent}</if>
+            <if test="articleAuthorId != null">article_author_id = #{articleAuthorId}</if>
+            <if test="articleCommentCount != null">article_comment_count = #{articleCommentCount}</if>
+            <if test="articleViewCount != null">article_view_count = #{articleViewCount}</if>
+            <if test="articleLikeCount != null">article_like_count=#{articleLikeCount}</if>
+            <if test="articleCreateTime != null">article_create_time = #{articleCreateTime}</if>
+            <if test="articleUpdateTime != null">article_update_time = #{articleUpdateTime}</if>
+            <if test="articleStatus != null">article_status = #{articleStatus}</if>
+        </set>
+        WHERE
+        article_id = #{articleId}
+    </update>
+
+<!--    获取文章总数-->
+    <select id="countArticle" resultType="Integer">
+        SELECT COUNT(1)
+        FROM
+        <include refid="tb"/>
+        WHERE
+        article_status = 1
+    </select>
+
+<!--    查询总的浏览数-->
+    <select id="countViews" resultType="Integer">
+        SELECT
+        SUM(article_view_count)
+        FROM
+        <include refid="tb"></include>
+        WHERE
+        article_status = #{status};
+    </select>
+
+<!--    最近更新的文章-->
+    <select id="selectLastUpdateArticle" resultMap="ArticleResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        <include refid="tb"/>
+        WHERE article_status = 1
+        ORDER BY article_update_time DESC
+        LIMIT 1
+    </select>
+
+<!--    根据ID查询文章详情-->
+    <select id="getArticleById" resultMap="ArticleResultMap">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        <include refid="tb"></include>
+        WHERE
+        article_id = #{id}
+    </select>
+
+<!--    根据评论数量对文章进行排序，取评论数前limit位的文章列表-->
+    <select id="getArticleListByCommentCount" resultMap="ArticleResultMap">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        <include refid="tb"></include>
+        WHERE
+        article_status = 1
+        ORDER BY
+        article_comment_count DESC
+        LIMIT
+        #{limit}
+    </select>
+
+<!--根据浏览数量对文章进行排序，取浏览数前limit位的文章列表-->
+    <select id="getArticleListByViewCount" resultMap="ArticleResultMap">
+        SELECT
+        <include refid="Base_Column_List"></include>
+        FROM
+        <include refid="tb"></include>
+        WHERE
+        article_status = 1
+        ORDER BY
+        article_view_count DESC
+        LIMIT
+        #{limit}
+    </select>
+
+<!--    增加点赞数-->
+    <update id="increaseLikeCountByArticleId">
+        UPDATE article
+        SET article_like_count = #{increaseCount} + #{articleLikeCount}
+        WHERE article_id = #{articleId}
+    </update>
+
+
+</mapper>
+
